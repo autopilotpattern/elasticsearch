@@ -1,0 +1,51 @@
+# Elasticsearch stack designed for container-native deployment
+# on Joyent's Triton platform.
+
+# ---------------------------------------------------
+# The master-only node serves as the coordinator of the cluster by providing
+# a known target for the data nodes to bootstrap unicast zen discovery
+
+elasticsearch_master:
+    image: 0x74696d/triton-elasticsearch:latest
+
+    environment:
+    - CLUSTER_NAME=elasticsearch
+    - ES_HEAP_SIZE=1g # set to 50% of mem_limit, but no more than 31g
+    # ES_HEAP_NEWSIZE # optional override
+    # ES_DIRECT_SIZE  # optional override
+
+    # On Triton we won't expose these unless we want to have ES exposed to the
+    # Internet; each container gets a private IP.
+    ports:
+    - 9200 # REST API
+    - 9300 # transport API
+
+    command: /usr/share/elasticsearch/bin/elasticsearch --default.config=/etc/elasticsearch/master-only.yml --default.path.conf=/etc/elasticsearch
+    restart: always
+
+# ---------------------------------------------------
+# The data nodes store data and act as potential master nodes.
+# If we want data-only nodes we can pass data-only.yml as the config file.
+
+elasticsearch:
+    image: 0x74696d/triton-elasticsearch:latest
+
+    environment:
+    - CLUSTER_NAME=elasticsearch
+    - ES_HEAP_SIZE=1g # set to 50% of mem_limit, but no more than 31g
+    # ES_HEAP_NEWSIZE # optional override
+    # ES_DIRECT_SIZE  # optional override
+    # ES_JAVA_OPTS    # optional override
+
+    # On Triton we won't expose these unless we want to have ES exposed to the
+    # Internet; each container gets a private IP.
+    ports:
+    - 9200 # REST API (see note above)
+    - 9300 # transport API
+
+    # Expose the master as a link for unicast zen discovery
+    links:
+    - elasticsearch_master
+
+    command: /usr/share/elasticsearch/bin/elasticsearch --default.config=/etc/elasticsearch/default.yml --default.path.conf=/etc/elasticsearch
+    restart: always
