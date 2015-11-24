@@ -5,7 +5,7 @@ while true
 do
     # get the list of master-only nodes from Consul
     MASTER=$(curl -Ls http://consul:8500/v1/catalog/service/elasticsearch-master | jq -r '.[0].ServiceAddress')
-    if [[ $master != "null" ]]; then
+    if [[ $MASTER != "null" ]] && [[ -n $MASTER ]]; then
         break
     fi
     # if this is the first master-only node, use itself to bootstrap
