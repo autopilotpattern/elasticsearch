@@ -42,8 +42,8 @@ node.name: es-${HOSTNAME}
 
 # By default, all nodes are eligible to become masters and store data.
 
-node.master: true
-node.data: false
+node.master: ${ES_NODE_MASTER}
+node.data: ${ES_NODE_DATA}
 
 # A node can have generic attributes associated with it, which can later be used
 # for customized shard allocation filtering, or allocation awareness. An attribute
@@ -55,6 +55,7 @@ node.data: false
 # to disable it, set the following:
 #
 #node.max_local_storage_nodes: 1
+
 
 #################################### Index ####################################
 
@@ -107,31 +108,23 @@ node.data: false
 
 #################################### Paths ####################################
 
+# These default paths are all set by the Debian package installed
+# in the Dockerfile
+
 # Path to directory containing configuration (this file and logging.yml):
-#
-#path.conf: /path/to/conf
+# path.conf: /etc/elasticsearch
 
 # Path to directory where to store index data allocated for this node.
-#
-#path.data: /path/to/data
-#
-# Can optionally include more than one location, causing data to be striped across
-# the locations (a la RAID 0) on a file level, favouring locations with most free
-# space on creation. For example:
-#
-#path.data: /path/to/data1,/path/to/data2
+# path.data: /var/lib/elasticsearch/data
 
 # Path to temporary files:
-#
-#path.work: /path/to/work
+# path.work: /tmp/elasticsearch
 
 # Path to log files:
-#
-#path.logs: /path/to/logs
+# path.logs: /var/log/elasticsearch
 
 # Path to where plugins are installed:
-#
-#path.plugins: /path/to/plugins
+# path.plugins: /usr/share/elasticsearch/plugins
 
 
 #################################### Plugin ###################################
@@ -277,10 +270,11 @@ node.data: false
 #
 #discovery.zen.ping.timeout: 3s
 
-# Triton doesn't support multicast so we bootstrap cluster communications
-# via unicast to the master-only node.
+# We'll bootstrap cluster communications by getting a master node via
+# the Containerbuddy `onStart` directive, which will rewrite this
+# configuration value with the appropriate hostname.
 discovery.zen.ping.multicast.enabled: false
-discovery.zen.ping.unicast.hosts: ["127.0.0.1"]
+discovery.zen.ping.unicast.hosts: ["${ES_BOOTSTRAP_HOST}"]
 
 ################################## Slow Log ##################################
 
