@@ -13,9 +13,8 @@ elasticsearch_master:
     - CONTAINERBUDDY=file:///etc/containerbuddy-master.json
     links:
     - consul:consul
-    expose:
-    - 9200 # REST API
-    - 9300 # transport API
+    ports:
+    - 9200:9200 # REST API
 
 elasticsearch:
     extends:
@@ -25,9 +24,6 @@ elasticsearch:
     build: .
     links:
     - consul:consul
-    expose:
-    - 9200 # REST API
-    - 9300 # transport API
 
 elasticsearch_data:
     extends:
@@ -40,11 +36,10 @@ elasticsearch_data:
     - ES_NODE_DATA=true
     links:
     - consul:consul
-    expose:
-    - 9200 # REST API
-    - 9300 # transport API
 
 consul:
     extends:
       file: common-compose.yml
       service: consul
+    ports:
+    - 8500:8500
