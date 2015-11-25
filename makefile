@@ -11,12 +11,13 @@ ship:
 
 # run a 3-data-node cluster on Triton
 run:
-	docker-compose -pes up -d
-	docker-compose -pes scale elasticsearch=3
+	docker-compose -p es up -d
+	docker-compose -p es scale elasticsearch=3
 
 # for testing against Docker locally
 test:
-	docker-compose -pes stop
-	docker-compose -pes rm -f
-	docker-compose -f docker-compose-local.yml -pes up -d
+	docker-compose -p es stop
+	docker-compose -p es rm -f
+	docker-compose -p es -f local-compose.yml build
+	docker-compose -p es -f local-compose.yml up -d
 	docker ps
