@@ -19,5 +19,5 @@ do
 done
 
 # update discovery.zen.ping.unicast.hosts
-REPLACEMENT=$(printf 's/${ES_BOOTSTRAP_HOST}/%s/' ${MASTER})
-sed -i ${REPLACEMENT} /etc/elasticsearch/default.yml
+REPLACEMENT=$(printf 's/^discovery\.zen\.ping\.unicast\.hosts.*$/discovery.zen.ping.unicast.hosts: ["%s"]/' ${MASTER})
+sed -i "${REPLACEMENT}" /etc/elasticsearch/default.yml
