@@ -31,7 +31,7 @@ Creating es_elasticsearch_1...
 
 Scale up that cluster to 3 data nodes.
 
-```bahs
+```bash
 $ docker-compose --project-name es scale=elasticsearch=3
 Creating and starting 2... done
 Creating and starting 3... done
