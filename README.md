@@ -3,46 +3,46 @@ triton-elasticsearch
 
 [Elasticsearch](https://www.elastic.co/products) stack designed for container-native deployment on Joyent's Triton platform.
 
-### Data
+### Discovery with Containerbuddy
 
-(TODO)
+Cloud deployments can't take advantage of multicast over the software-defined networks available from AWS, GCE, or Joyent's Triton. Although a separate plugin could be developed to run discovery, in this case we're going to take advantage of a fairly typical production topology for Elasticsearch -- master-only nodes.
 
-### Discovery
-
-(TODO)
-
-Cloud deployments can't take advantage of multicast over the software-defined networks available from AWS, GCE, or Joyent's Triton. Although a separate plugin could be developed to run discovery, in this case we're going to take advantage of a fairly typical production topology for Elasticsearch -- master-only nodes. Our data nodes will be linked to master nodes and be able to use that container's IP to bootstrap unicast zen discovery.
+When a data node starts, it will use [Containerbuddy](https://github.com/joyent/containerbuddy) to query Consul and find a master node to bootstrap unicast zen discovery. We write this to the node configuration file on each start, so if the bootstrap node dies we can still safely reboot data nodes and join them to whatever master is available.
 
 ### Usage
 
-(TODO)
+1. [Get a Joyent account](https://my.joyent.com/landing/signup/) and [add your SSH key](https://docs.joyent.com/public-cloud/getting-started).
+1. Install the [Docker Toolbox](https://docs.docker.com/installation/mac/) (including `docker` and `docker-compose`) on your laptop or other environment, as well as the [Joyent CloudAPI CLI tools](https://apidocs.joyent.com/cloudapi/#getting-started) (including the `smartdc` and `json` tools).
 
-Launch a cluster with a single master-only node and a single data node.
+Launch a cluster with a single master-only node, a single data-only node, and a master/data node.
 
 ```bash
-$ docker-compose --project-name es up -d
+$ docker-compose -p es up -d
 Pulling elasticsearch_master (0x74696d/triton-elasticsearch:latest)...
 latest: Pulling from 0x74696d/triton-elasticsearch
 ...
 Status: Downloaded newer image for 0x74696d/triton-elasticsearch:latest
+Creating es_consul_1...
 Creating es_elasticsearch_master_1...
 Creating es_elasticsearch_1...
+Creating es_data_1...
 ```
 
-Scale up that cluster to 3 data nodes.
+Scale up that cluster to 3 master/data nodes.
 
 ```bash
-$ docker-compose --project-name es scale=elasticsearch=3
+$ docker-compose -p es scale=elasticsearch=3
 Creating and starting 2... done
 Creating and starting 3... done
 
-$ docker ps
-docker ps
-CONTAINER ID        IMAGE                           COMMAND                  CREATED              STATUS              PORTS                              NAMES
-d9b96354c62f        0x74696d/triton-elasticsearch   "/usr/share/elasticse"   57 seconds ago       Up 26 seconds       9200/tcp, 9300/tcp                 es_elasticsearch_3
-11796a8a77cb        0x74696d/triton-elasticsearch   "/usr/share/elasticse"   About a minute ago   Up About a minute   9200/tcp, 9300/tcp                 es_elasticsearch_2
-e36436b26d05        0x74696d/triton-elasticsearch   "/usr/share/elasticse"   2 minutes ago        Up 2 minutes        9200/tcp, 9300/tcp                 es_elasticsearch_1
-17e3539d1c47        0x74696d/triton-elasticsearch   "/usr/share/elasticse"   3 minutes ago        Up 3 minutes        0.0.0.0:9200->9200/tcp, 9300/tcp   es_elasticsearch_master_1
+$ docker ps --format 'table {{ .ID }}\t{{ .Image }}\t{{ .Names }}'
+CONTAINER ID        IMAGE                            NAMES
+a0af06436c11        0x74696d/triton-elasticsearch    es_elasticsearch_data_1
+d0df7ebe88d0        0x74696d/triton-elasticsearch    es_elasticsearch_master_1
+1c8917b1064b        0x74696d/triton-elasticsearch    es_elasticsearch_1
+e36436b26d05        0x74696d/triton-elasticsearch    es_elasticsearch_2
+d9b96354c62f        0x74696d/triton-elasticsearch    es_elasticsearch_3
+ad52bdd1a78e        progrium/consul:latest           es_consul_1
 
 ```
 
