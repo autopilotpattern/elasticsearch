@@ -16,9 +16,11 @@ elasticsearch:
     - ES_NODE_MASTER=true # default
     - ES_NODE_DATA=true   # default
     - CONTAINERBUDDY=file:///etc/containerbuddy.json
+    # set the number of threads we want based on the number of CPU shares
+    # that we'll get for this size container on Triton
+    - ES_JAVA_OPTS=-XX:-UseGCTaskAffinity -XX:-BindGCTaskThreadsToCPUs -XX:ParallelGCThreads=1 -XX:ParallelCMSThreads=1
     # ES_HEAP_NEWSIZE # optional override
     # ES_DIRECT_SIZE  # optional override
-    # ES_JAVA_OPTS    # optional override
 
     # Normally on Triton we won't expose these unless we want to have ES exposed
     # to the Internet. Each container gets a private IP for internal use.
