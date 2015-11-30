@@ -31,18 +31,17 @@ Creating es_data_1...
 Scale up that cluster to 3 master/data nodes.
 
 ```bash
-$ docker-compose -p es scale=elasticsearch=3
+$ docker-compose -p es scale elasticsearch=3
 Creating and starting 2... done
 Creating and starting 3... done
 
 $ docker ps --format 'table {{ .ID }}\t{{ .Image }}\t{{ .Names }}'
-CONTAINER ID        IMAGE                            NAMES
-a0af06436c11        0x74696d/triton-elasticsearch    es_elasticsearch_data_1
-d0df7ebe88d0        0x74696d/triton-elasticsearch    es_elasticsearch_master_1
-1c8917b1064b        0x74696d/triton-elasticsearch    es_elasticsearch_1
-e36436b26d05        0x74696d/triton-elasticsearch    es_elasticsearch_2
-d9b96354c62f        0x74696d/triton-elasticsearch    es_elasticsearch_3
-ad52bdd1a78e        progrium/consul:latest           es_consul_1
+8f675e1de88d        0x74696d/triton-elasticsearch   es_elasticsearch_2
+34f754d16a45        0x74696d/triton-elasticsearch   es_elasticsearch_3
+475f1e748f93        0x74696d/triton-elasticsearch   es_elasticsearch_data_1
+730ef555af95        0x74696d/triton-elasticsearch   es_elasticsearch_master_1
+dad25bc6659d        0x74696d/triton-elasticsearch   es_elasticsearch_1
+f806ec8d7da3        progrium/consul                 es_consul_1
 
 ```
 
@@ -72,44 +71,53 @@ $ curl "http://${MASTER_IP}:9200/_cluster/health?pretty=true"
 Lets get some more details on the cluster:
 
 ```bash
-curl "http://$MASTER_IP:9200/_cluster/state?pretty=true"
+$ curl "http://${MASTER_IP}:9200/_cluster/state?pretty=true"
 {
   "cluster_name" : "elasticsearch",
-  "version" : 5,
-  "master_node" : "yQHnYFFjTtSO8cVHv9ychg",
+  "version" : 6,
+  "state_uuid" : "UTVIQa_sTJmOkzUghri3Kg",
+  "master_node" : "KnRTARjyQ2-_OML81iiO8A",
   "blocks" : { },
   "nodes" : {
-    "x7l7vBN9QnKFW4HZzGKMnA" : {
-      "name" : "es-d9b96354c62f",
-      "transport_address" : "inet[/192.168.128.17:9300]",
-      "attributes" : {
-        "master" : "true"
-      }
-    },
-    "V8C_Mi8SRvuuNZj0mBvjFg" : {
-      "name" : "es-11796a8a77cb",
-      "transport_address" : "inet[/192.168.128.16:9300]",
-      "attributes" : {
-        "master" : "true"
-      }
-    },
-    "k8Fqw3jXQBCK7ArUWRoYgQ" : {
-      "name" : "es-e36436b26d05",
-      "transport_address" : "inet[/192.168.128.15:9300]",
-      "attributes" : {
-        "master" : "true"
-      }
-    },
-    "yQHnYFFjTtSO8cVHv9ychg" : {
-      "name" : "es-17e3539d1c47",
-      "transport_address" : "inet[/192.168.128.14:9300]",
+    "KnRTARjyQ2-_OML81iiO8A" : {
+      "name" : "es-730ef555af95",
+      "transport_address" : "192.168.128.137:9300",
       "attributes" : {
         "data" : "false",
+        "master" : "true"
+      }
+    },
+    "T4AA6uvZRe-kCaE-nDM9ww" : {
+      "name" : "es-dad25bc6659d",
+      "transport_address" : "192.168.128.136:9300",
+      "attributes" : {
+        "master" : "true"
+      }
+    },
+    "a-4ER37vQqCDak7K-2DH8A" : {
+      "name" : "es-475f1e748f93",
+      "transport_address" : "192.168.128.138:9300",
+      "attributes" : {
+        "master" : "false"
+      }
+    },
+    "a06pnuRSQIG9kvXTDEiLhA" : {
+      "name" : "es-8f675e1de88d",
+      "transport_address" : "192.168.128.140:9300",
+      "attributes" : {
+        "master" : "true"
+      }
+    },
+    "TgDqSKQTTnigBdUF6_Fdkg" : {
+      "name" : "es-34f754d16a45",
+      "transport_address" : "192.168.128.139:9300",
+      "attributes" : {
         "master" : "true"
       }
     }
   },
   "metadata" : {
+    "cluster_uuid" : "uTvKs32PStW0Q4swo2v-dQ",
     "templates" : { },
     "indices" : { }
   },
@@ -119,12 +127,12 @@ curl "http://$MASTER_IP:9200/_cluster/state?pretty=true"
   "routing_nodes" : {
     "unassigned" : [ ],
     "nodes" : {
-      "x7l7vBN9QnKFW4HZzGKMnA" : [ ],
-      "k8Fqw3jXQBCK7ArUWRoYgQ" : [ ],
-      "V8C_Mi8SRvuuNZj0mBvjFg" : [ ]
+      "TgDqSKQTTnigBdUF6_Fdkg" : [ ],
+      "a06pnuRSQIG9kvXTDEiLhA" : [ ],
+      "T4AA6uvZRe-kCaE-nDM9ww" : [ ],
+      "a-4ER37vQqCDak7K-2DH8A" : [ ]
     }
-  },
-  "allocations" : [ ]
+  }
 }
 
 ```
