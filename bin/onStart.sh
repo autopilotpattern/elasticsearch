@@ -20,4 +20,4 @@ done
 
 # update discovery.zen.ping.unicast.hosts
 REPLACEMENT=$(printf 's/^discovery\.zen\.ping\.unicast\.hosts.*$/discovery.zen.ping.unicast.hosts: ["%s"]/' ${MASTER})
-sed -i "${REPLACEMENT}" /etc/elasticsearch/default.yml
+sed -i "${REPLACEMENT}" /etc/elasticsearch/elasticsearch.yml

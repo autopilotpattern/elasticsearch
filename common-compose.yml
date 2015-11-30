@@ -31,7 +31,6 @@ elasticsearch:
     command: >
       /opt/containerbuddy/containerbuddy
       /usr/share/elasticsearch/bin/elasticsearch
-      --default.config=/etc/elasticsearch/default.yml
       --default.path.conf=/etc/elasticsearch
 
 # ---------------------------------------------------

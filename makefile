@@ -16,8 +16,8 @@ run:
 
 # for testing against Docker locally
 test:
-	docker-compose -p es stop
-	docker-compose -p es rm -f
+	docker-compose -p es stop || true
+	docker-compose -p es rm -f || true
 	docker-compose -p es -f local-compose.yml build
 	docker-compose -p es -f local-compose.yml up -d
 	docker ps

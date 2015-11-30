@@ -11,8 +11,8 @@ ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
 
 # If we wanted the development version we could pull that instead but we want to
 # run a production environment here
-RUN export ES_PKG=elasticsearch-1.7.1.deb && \
-    curl -LO https://download.elastic.co/elasticsearch/elasticsearch/${ES_PKG} && \
+RUN export ES_PKG=elasticsearch-2.1.0.deb && \
+    curl -LO https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.1.0/${ES_PKG} && \
     dpkg -i ${ES_PKG} && \
     rm ${ES_PKG} && \
     rm /etc/elasticsearch/elasticsearch.yml
@@ -25,13 +25,22 @@ RUN export CB=containerbuddy-0.0.2-alpha &&\
 	tar -xf /tmp/${CB}.tar.gz && \
     mv /build/containerbuddy /opt/containerbuddy/
 
+# Take ownership over required directories
+RUN mkdir -p /var/lib/elasticsearch/data && \
+    chown -R elasticsearch:elasticsearch /var/lib/elasticsearch/data && \
+    chown -R root:elasticsearch /etc/elasticsearch && \
+    chmod g+w /etc/elasticsearch
+
+USER elasticsearch
+
 # Add our configuration files and scripts
-ADD /etc/containerbuddy /etc/
-ADD /etc/elasticsearch.yml /etc/elasticsearch/default.yml
-ADD /bin/onStart.sh /opt/containerbuddy/onStart.sh
+COPY /etc/containerbuddy /etc/
+COPY /etc/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+COPY /bin/onStart.sh /opt/containerbuddy/onStart.sh
 
 # Expose the data directory as a volume in case we want to mount these
-# as a --volumes-from target
+# as a --volumes-from target; it's important that this VOLUME comes
+# after the creation of the directory so that we preserve ownership.
 VOLUME /var/lib/elasticsearch/data
 
 # We don't need to expose these ports in order for other containers on Triton
