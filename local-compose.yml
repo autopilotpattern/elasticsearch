@@ -1,0 +1,45 @@
+# Local testing version of Elasticsearch stack designed for
+# container-native deployment on Joyent's Triton platform.
+
+elasticsearch_master:
+    extends:
+      file: common-compose.yml
+      service: elasticsearch
+    mem_limit: 512m
+    build: .
+    environment:
+    - ES_NODE_MASTER=true
+    - ES_NODE_DATA=false
+    - CONTAINERBUDDY=file:///etc/containerbuddy-master.json
+    links:
+    - consul:consul
+    ports:
+    - 9200:9200 # REST API
+
+elasticsearch:
+    extends:
+      file: common-compose.yml
+      service: elasticsearch
+    mem_limit: 512m
+    build: .
+    links:
+    - consul:consul
+
+elasticsearch_data:
+    extends:
+      file: common-compose.yml
+      service: elasticsearch
+    mem_limit: 512m
+    build: .
+    environment:
+    - ES_NODE_MASTER=false
+    - ES_NODE_DATA=true
+    links:
+    - consul:consul
+
+consul:
+    extends:
+      file: common-compose.yml
+      service: consul
+    ports:
+    - 8500:8500
