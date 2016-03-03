@@ -8,9 +8,11 @@ elasticsearch_master:
     mem_limit: 512m
     build: .
     environment:
-    - ES_NODE_MASTER=true
-    - ES_NODE_DATA=false
-    - CONTAINERBUDDY=file:///etc/containerbuddy-master.json
+      - CONSUL=consul
+      - ES_SERVICE_NAME=elasticsearch-master
+      - ES_NODE_MASTER=true
+      - ES_NODE_DATA=false
+      - CONTAINERBUDDY=file:///etc/containerbuddy.json
     links:
     - consul:consul
     ports:
@@ -22,8 +24,10 @@ elasticsearch:
       service: elasticsearch
     mem_limit: 512m
     build: .
+    environment:
+      - CONSUL=consul
     links:
-    - consul:consul
+      - consul:consul
 
 elasticsearch_data:
     extends:
@@ -32,14 +36,15 @@ elasticsearch_data:
     mem_limit: 512m
     build: .
     environment:
-    - ES_NODE_MASTER=false
-    - ES_NODE_DATA=true
+      - CONSUL=consul
+      - ES_NODE_MASTER=false
+      - ES_NODE_DATA=true
     links:
-    - consul:consul
+      - consul:consul
 
 consul:
     extends:
       file: docker-compose.yml
       service: consul
     ports:
-    - 8500:8500
+      - 8500:8500

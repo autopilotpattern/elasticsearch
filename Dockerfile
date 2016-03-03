@@ -35,9 +35,9 @@ RUN mkdir -p /var/lib/elasticsearch/data \
 USER elasticsearch
 
 # Add our configuration files and scripts
-COPY /etc/containerbuddy /etc/
+COPY /etc/containerbuddy.json /etc
 COPY /etc/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-COPY /bin/onStart.sh /etc/containerbuddy/onStart.sh
+COPY /bin/onStart.sh /bin
 
 # Expose the data directory as a volume in case we want to mount these
 # as a --volumes-from target; it's important that this VOLUME comes

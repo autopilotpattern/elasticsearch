@@ -1,9 +1,9 @@
 {
-  "consul": "consul:8500",
-  "onStart": "/opt/containerbuddy/onStart.sh",
+  "consul": "{{ .CONSUL }}:8500",
+  "onStart": "/bin/onStart.sh",
   "services": [
     {
-      "name": "elasticsearch-master",
+      "name": "{{ .ES_SERVICE_NAME }}",
       "port": 9300,
       "health": "/usr/bin/curl --fail -s -o /dev/null http://localhost:9200",
       "poll": 10,
