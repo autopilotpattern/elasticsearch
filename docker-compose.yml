@@ -2,11 +2,36 @@
 # on Joyent's Triton platform.
 
 # ---------------------------------------------------
+# This common service acts as a template for master-only, data-only, and
+# master+data ES services
+
+elasticsearch:
+    image: 0x74696d/triton-elasticsearch:latest
+    mem_limit: 4g
+    restart: always
+
+    environment:
+    - CLUSTER_NAME=elasticsearch
+    - ES_HEAP_SIZE=1g # set to 50% of mem_limit, but no more than 31g
+    - ES_NODE_MASTER=true # default
+    - ES_NODE_DATA=true   # default
+    - CONTAINERBUDDY=file:///etc/containerbuddy.json
+    # set the number of threads we want based on the number of CPU shares
+    # that we'll get for this size container on Triton
+    - ES_JAVA_OPTS=-XX:-UseGCTaskAffinity -XX:-BindGCTaskThreadsToCPUs -XX:ParallelGCThreads=1 -XX:ParallelCMSThreads=1
+    # ES_HEAP_NEWSIZE # optional override
+    # ES_DIRECT_SIZE  # optional override
+
+    command: >
+      /opt/containerbuddy/containerbuddy
+      /usr/share/elasticsearch/bin/elasticsearch
+      --default.path.conf=/etc/elasticsearch
+
+# ---------------------------------------------------
 # The master-only node serves as the coordinator of the cluster only
 
 elasticsearch_master:
     extends:
-      file: common-compose.yml
       service: elasticsearch
     environment:
     - ES_NODE_MASTER=true
@@ -25,7 +50,6 @@ elasticsearch_master:
 
 elasticsearch:
     extends:
-      file: common-compose.yml
       service: elasticsearch
     links:
     - consul:consul # we'll remove this once TCNS goes live
@@ -35,7 +59,6 @@ elasticsearch:
 
 elasticsearch_data:
     extends:
-      file: common-compose.yml
       service: elasticsearch
     environment:
     - ES_NODE_MASTER=false
@@ -43,10 +66,23 @@ elasticsearch_data:
     links:
     - consul:consul # we'll remove this once TCNS goes live
 
+
 # ---------------------------------------------------
 # Consul as a service discovery tier
 
 consul:
-    extends:
-      file: common-compose.yml
-      service: consul
+    image: progrium/consul:latest
+    command: -server -bootstrap -ui-dir /ui
+    restart: always
+    mem_limit: 128m
+    ports:
+        - 8500
+    expose:
+        - 53
+        - 8300
+        - 8301
+        - 8302
+        - 8400
+        - 8500
+    dns:
+       - 127.0.0.1

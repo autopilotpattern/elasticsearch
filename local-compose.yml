@@ -3,7 +3,7 @@
 
 elasticsearch_master:
     extends:
-      file: common-compose.yml
+      file: docker-compose.yml
       service: elasticsearch
     mem_limit: 512m
     build: .
@@ -18,7 +18,7 @@ elasticsearch_master:
 
 elasticsearch:
     extends:
-      file: common-compose.yml
+      file: docker-compose.yml
       service: elasticsearch
     mem_limit: 512m
     build: .
@@ -27,7 +27,7 @@ elasticsearch:
 
 elasticsearch_data:
     extends:
-      file: common-compose.yml
+      file: docker-compose.yml
       service: elasticsearch
     mem_limit: 512m
     build: .
@@ -39,7 +39,7 @@ elasticsearch_data:
 
 consul:
     extends:
-      file: common-compose.yml
+      file: docker-compose.yml
       service: consul
     ports:
     - 8500:8500
