@@ -30,7 +30,7 @@ elasticsearch:
 
     command: >
       /bin/containerbuddy
-      /usr/share/elasticsearch/bin/elasticsearch
+      /opt/elasticsearch/bin/elasticsearch
       --default.path.conf=/etc/elasticsearch
 
 # ---------------------------------------------------
