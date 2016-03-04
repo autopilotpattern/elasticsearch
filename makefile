@@ -2,22 +2,30 @@ MAKEFLAGS += --warn-undefined-variables
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail
 .DEFAULT_GOAL := build
+.PHONY:	*
+
+export COMPOSE_PROJECT_NAME := es
+export COMPOSE_FILE := local-compose.yml
+
+# ----------------------------------------------
+# building for  local testing and development. When deploying on production
+# environments like Triton, `docker-compose up -d` is sufficient
 
 build:
-	docker build -t="0x74696d/triton-elasticsearch" .
+	docker-compose build
 
+# send the demonstration container up to the Docker Hub
 ship:
+	docker tag -f es_elasticsearch 0x74696d/triton-elasticsearch
 	docker push 0x74696d/triton-elasticsearch
 
-# run a 3-data-node cluster on Triton
-run:
-	docker-compose -p es up -d
-	docker-compose -p es scale elasticsearch=3
+# ----------------------------------------------
+# for testing against local Docker Engine
 
-# for testing against Docker locally
-test:
-	docker-compose -p es stop || true
-	docker-compose -p es rm -f || true
-	docker-compose -p es -f local-compose.yml build
-	docker-compose -p es -f local-compose.yml up -d
+clean:
+	docker-compose stop || true
+	docker-compose rm -f || true
+
+test: clean build
+	docker-compose up -d
 	docker ps
