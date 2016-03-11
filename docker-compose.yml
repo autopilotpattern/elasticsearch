@@ -40,7 +40,7 @@ elasticsearch_master:
     extends:
       service: elasticsearch
     labels:
-      - triton.cns.services=elasticsearch_master
+      - triton.cns.services=elasticsearch-master
     environment:
       - ES_SERVICE_NAME=elasticsearch-master
       - ES_NODE_MASTER=true
@@ -58,7 +58,7 @@ elasticsearch_data:
     extends:
       service: elasticsearch
     labels:
-      - triton.cns.services=elasticsearch_data
+      - triton.cns.services=elasticsearch-data
     environment:
       - ES_NODE_MASTER=false
       - ES_NODE_DATA=true
