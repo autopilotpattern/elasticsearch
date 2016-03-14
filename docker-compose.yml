@@ -30,7 +30,7 @@ elasticsearch:
 
     command: >
       /bin/containerbuddy
-      /opt/elasticsearch/bin/elasticsearch
+      /usr/share/elasticsearch/bin/elasticsearch
       --default.path.conf=/etc/elasticsearch
 
 # ---------------------------------------------------
@@ -45,11 +45,6 @@ elasticsearch_master:
       - ES_SERVICE_NAME=elasticsearch-master
       - ES_NODE_MASTER=true
       - ES_NODE_DATA=false
-
-    # We expose 9200 to the Internet on the master only in this example for
-    # illustration and testing.
-    ports:
-    - 9200 # REST API
 
 # ---------------------------------------------------
 # Data-only nodes never act as master nodes.
