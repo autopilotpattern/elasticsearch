@@ -27,7 +27,6 @@ RUN export CB_SHA1=aca04b3c6d6ed66294241211237012a23f8b4f20 \
     && rm /tmp/containerbuddy.tar.gz
 
 # Create and take ownership over required directories
-# Take ownership over required directories
 RUN mkdir -p /var/lib/elasticsearch/data && \
     chown -R elasticsearch:elasticsearch /var/lib/elasticsearch/data && \
     chown -R root:elasticsearch /etc/elasticsearch && \
