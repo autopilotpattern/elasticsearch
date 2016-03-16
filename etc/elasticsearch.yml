@@ -57,7 +57,7 @@ path.logs: /var/log/elasticsearch
 
 # Set the bind address to a specific IP (IPv4 or IPv6):
 
-network.host: 0.0.0.0
+network.host: _eth0:ipv4_
 
 # Set a custom port for HTTP:
 #
