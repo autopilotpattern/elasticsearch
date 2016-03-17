@@ -30,6 +30,7 @@ onStart() {
         do
             sleep 1.7
             configureMaster
+            n=$((n+1))
         done
     fi
 
