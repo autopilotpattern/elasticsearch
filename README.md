@@ -1,4 +1,4 @@
-triton-elasticsearch
+Elasticsearch autopilot pattern
 ==========
 
 [Elasticsearch](https://www.elastic.co/products) stack designed for container-native deployment on Joyent's Triton platform.
@@ -18,10 +18,10 @@ Launch a cluster with a single master-only node, a single data-only node, and a 
 
 ```bash
 $ docker-compose -p es up -d
-Pulling elasticsearch_master (0x74696d/triton-elasticsearch:latest)...
-latest: Pulling from 0x74696d/triton-elasticsearch
+Pulling elasticsearch_master (autopilotpattern/elasticsearch:latest)...
+latest: Pulling from autopilotpattern/elasticsearch
 ...
-Status: Downloaded newer image for 0x74696d/triton-elasticsearch:latest
+Status: Downloaded newer image for autopilotpattern/elasticsearch:latest
 Creating es_consul_1...
 Creating es_elasticsearch_master_1...
 Creating es_elasticsearch_1...
@@ -36,12 +36,12 @@ Creating and starting 2... done
 Creating and starting 3... done
 
 $ docker ps --format 'table {{ .ID }}\t{{ .Image }}\t{{ .Names }}'
-8f675e1de88d        0x74696d/triton-elasticsearch   es_elasticsearch_2
-34f754d16a45        0x74696d/triton-elasticsearch   es_elasticsearch_3
-475f1e748f93        0x74696d/triton-elasticsearch   es_elasticsearch_data_1
-730ef555af95        0x74696d/triton-elasticsearch   es_elasticsearch_master_1
-dad25bc6659d        0x74696d/triton-elasticsearch   es_elasticsearch_1
-f806ec8d7da3        progrium/consul                 es_consul_1
+8f675e1de88d        autopilotpattern/elasticsearch   es_elasticsearch_2
+34f754d16a45        autopilotpattern/elasticsearch   es_elasticsearch_3
+475f1e748f93        autopilotpattern/elasticsearch   es_elasticsearch_data_1
+730ef555af95        autopilotpattern/elasticsearch   es_elasticsearch_master_1
+dad25bc6659d        autopilotpattern/elasticsearch   es_elasticsearch_1
+f806ec8d7da3        progrium/consul                  es_consul_1
 
 ```
 

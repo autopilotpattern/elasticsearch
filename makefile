@@ -16,8 +16,8 @@ build:
 
 # send the demonstration container up to the Docker Hub
 ship:
-	docker tag -f es_elasticsearch 0x74696d/triton-elasticsearch
-	docker push 0x74696d/triton-elasticsearch
+	docker tag -f es_elasticsearch autopilotpattern/elasticsearch
+	docker push autopilotpattern/elasticsearch
 
 # ----------------------------------------------
 # for testing against local Docker Engine
