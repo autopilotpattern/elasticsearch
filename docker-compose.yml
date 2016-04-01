@@ -7,7 +7,7 @@
 # master-only and data-only ES nodes.
 
 elasticsearch:
-    image: 0x74696d/triton-elasticsearch:latest
+    image: autopilotpattern/elasticsearch:latest
     mem_limit: 4g
     restart: always
     labels:
