@@ -6,7 +6,7 @@ Autopilot Pattern Elasticsearch
 [![DockerPulls](https://img.shields.io/docker/pulls/autopilotpattern/elasticsearch.svg)](https://registry.hub.docker.com/u/autopilotpattern/elasticsearch/)
 [![DockerStars](https://img.shields.io/docker/stars/autopilotpattern/elasticsearch.svg)](https://registry.hub.docker.com/u/autopilotpattern/elasticsearch/)
 [![ImageLayers](https://badge.imagelayers.io/autopilotpattern/elasticsearch:latest.svg)](https://imagelayers.io/?images=autopilotpattern/elasticsearch:latest)
-[![Join the chat at https://gitter.im/autopilotpattern/elasticsearch](https://badges.gitter.im/autopilotpattern/elasticsearch.svg)](https://gitter.im/autopilotpattern/elasticsearch)
+[![Join the chat at https://gitter.im/autopilotpattern/general](https://badges.gitter.im/autopilotpattern/general.svg)](https://gitter.im/autopilotpattern/general)
 
 ### Discovery with Containerbuddy
 
