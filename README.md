@@ -1,7 +1,12 @@
-Elasticsearch autopilot pattern
+Autopilot Pattern Elasticsearch
 ==========
 
-[Elasticsearch](https://www.elastic.co/products) stack designed for container-native deployment on Joyent's Triton platform.
+[Elasticsearch](https://www.elastic.co/products) designed for automated operation using the [Autopilot Pattern](http://autopilotpattern.io/).
+
+[![DockerPulls](https://img.shields.io/docker/pulls/autopilotpattern/elasticsearch.svg)](https://registry.hub.docker.com/u/autopilotpattern/elasticsearch/)
+[![DockerStars](https://img.shields.io/docker/stars/autopilotpattern/elasticsearch.svg)](https://registry.hub.docker.com/u/autopilotpattern/elasticsearch/)
+[![ImageLayers](https://badge.imagelayers.io/autopilotpattern/elasticsearch:latest.svg)](https://imagelayers.io/?images=autopilotpattern/elasticsearch:latest)
+[![Join the chat at https://gitter.im/autopilotpattern/general](https://badges.gitter.im/autopilotpattern/general.svg)](https://gitter.im/autopilotpattern/general)
 
 ### Discovery with Containerbuddy
 
