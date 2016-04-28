@@ -86,7 +86,7 @@ network.host: _eth0:ipv4_
 # discovery.zen.minimum_master_nodes: 3
 
 # We'll bootstrap cluster communications by getting a master node via
-# the Containerbuddy `onStart` directive, which will rewrite this
+# the ContainerPilot `preStart` directive, which will rewrite this
 # configuration value with the appropriate hostname.
 
 discovery.zen.ping.multicast.enabled: false

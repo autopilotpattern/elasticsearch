@@ -7,7 +7,7 @@ if [[ -z ${CONSUL} ]]; then
     exit 1
 fi
 
-onStart() {
+preStart() {
     # happy path is that there's a master available and we can cluster
     configureMaster
 
