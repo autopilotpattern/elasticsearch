@@ -8,11 +8,11 @@ Autopilot Pattern Elasticsearch
 [![ImageLayers](https://badge.imagelayers.io/autopilotpattern/elasticsearch:latest.svg)](https://imagelayers.io/?images=autopilotpattern/elasticsearch:latest)
 [![Join the chat at https://gitter.im/autopilotpattern/general](https://badges.gitter.im/autopilotpattern/general.svg)](https://gitter.im/autopilotpattern/general)
 
-### Discovery with Containerbuddy
+### Discovery with ContainerPilot
 
 Cloud deployments can't take advantage of multicast over the software-defined networks available from AWS, GCE, or Joyent's Triton. Although a separate plugin could be developed to run discovery, in this case we're going to take advantage of a fairly typical production topology for Elasticsearch -- master-only nodes.
 
-When a data node starts, it will use [Containerbuddy](https://github.com/joyent/containerbuddy) to query Consul and find a master node to bootstrap unicast zen discovery. We write this to the node configuration file on each start, so if the bootstrap node dies we can still safely reboot data nodes and join them to whatever master is available.
+When a data node starts, it will use [ContainerPilot](https://github.com/joyent/containerpilot) to query Consul and find a master node to bootstrap unicast zen discovery. We write this to the node configuration file on each start, so if the bootstrap node dies we can still safely reboot data nodes and join them to whatever master is available.
 
 ### Usage
 

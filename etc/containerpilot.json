@@ -1,11 +1,11 @@
 {
   "consul": "{{ .CONSUL }}:8500",
-  "onStart": "/bin/manage.sh onStart",
+  "preStart": "/usr/local/bin/manage.sh preStart",
   "services": [
     {
       "name": "{{ .ES_SERVICE_NAME }}",
       "port": 9300,
-      "health": "/bin/manage.sh health",
+      "health": "/usr/local/bin/manage.sh health",
       "poll": 10,
       "ttl": 25
     }

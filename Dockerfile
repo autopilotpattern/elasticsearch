@@ -2,7 +2,7 @@ FROM debian:jessie
 
 RUN apt-get update && \
     apt-get install -y \
-    openjdk-7-jre \
+    openjdk-7-jre-headless \
     curl \
     jq \
     && rm -rf /var/lib/apt/lists/*
@@ -17,14 +17,16 @@ RUN export ES_PKG=elasticsearch-2.2.0.deb && \
     rm ${ES_PKG} && \
     rm /etc/elasticsearch/elasticsearch.yml
 
-# get Containerbuddy release
-ENV CONTAINERBUDDY_VERSION 1.2.1
-RUN export CB_SHA1=aca04b3c6d6ed66294241211237012a23f8b4f20 \
-    && curl -Lso /tmp/containerbuddy.tar.gz \
-        "https://github.com/joyent/containerbuddy/releases/download/${CONTAINERBUDDY_VERSION}/containerbuddy-${CONTAINERBUDDY_VERSION}.tar.gz" \
-    && echo "${CB_SHA1}  /tmp/containerbuddy.tar.gz" | sha1sum -c \
-    && tar zxf /tmp/containerbuddy.tar.gz -C /bin \
-    && rm /tmp/containerbuddy.tar.gz
+# Add Containerpilot and set its configuration
+ENV CONTAINERPILOT_VER 2.1.0
+ENV CONTAINERPILOT file:///etc/containerpilot.json
+
+RUN export CONTAINERPILOT_CHECKSUM=e7973bf036690b520b450c3a3e121fc7cd26f1a2 \
+    && curl -Lso /tmp/containerpilot.tar.gz \
+         "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VER}/containerpilot-${CONTAINERPILOT_VER}.tar.gz" \
+    && echo "${CONTAINERPILOT_CHECKSUM}  /tmp/containerpilot.tar.gz" | sha1sum -c \
+    && tar zxf /tmp/containerpilot.tar.gz -C /usr/local/bin \
+    && rm /tmp/containerpilot.tar.gz
 
 # Create and take ownership over required directories
 RUN mkdir -p /var/lib/elasticsearch/data && \
@@ -35,9 +37,9 @@ RUN mkdir -p /var/lib/elasticsearch/data && \
 USER elasticsearch
 
 # Add our configuration files and scripts
-COPY /etc/containerbuddy.json /etc
+COPY /etc/containerpilot.json /etc
 COPY /etc/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-COPY /bin/manage.sh /bin
+COPY /bin/manage.sh /usr/local/bin
 
 # Expose the data directory as a volume in case we want to mount these
 # as a --volumes-from target; it's important that this VOLUME comes

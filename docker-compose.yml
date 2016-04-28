@@ -1,5 +1,5 @@
 # Elasticsearch stack designed for container-native deployment
-# on Joyent's Triton platform.
+# using the Autopilot Pattern on Joyent's Triton platform.
 
 # ---------------------------------------------------
 # This common service definition is the default for nodes that both store
@@ -20,7 +20,6 @@ elasticsearch:
       - ES_HEAP_SIZE=1g # set to 50% of mem_limit, but no more than 31g
       - ES_NODE_MASTER=true # default
       - ES_NODE_DATA=true   # default
-      - CONTAINERBUDDY=file:///etc/containerbuddy.json
 
       # set the number of threads we want based on the number of CPU shares
       # that we'll get for this size container on Triton
@@ -29,7 +28,7 @@ elasticsearch:
       # ES_DIRECT_SIZE  # optional override
 
     command: >
-      /bin/containerbuddy
+      /usr/local/bin/containerpilot
       /usr/share/elasticsearch/bin/elasticsearch
       --default.path.conf=/etc/elasticsearch
 

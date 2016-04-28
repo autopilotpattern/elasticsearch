@@ -12,7 +12,7 @@ elasticsearch_master:
       - ES_SERVICE_NAME=elasticsearch-master
       - ES_NODE_MASTER=true
       - ES_NODE_DATA=false
-      - CONTAINERBUDDY=file:///etc/containerbuddy.json
+      - CONTAINERPILOT=file:///etc/containerpilot.json
     links:
     - consul:consul
 
