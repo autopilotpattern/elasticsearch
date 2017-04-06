@@ -1,50 +1,51 @@
-# Local testing version of Elasticsearch stack designed for
-# container-native deployment on Joyent's Triton platform.
+version: '2.1'
+services:
+    # Local testing version of Elasticsearch stack designed for
+    # container-native deployment on Joyent's Triton platform.
+    elasticsearch:
+        build: .
+        environment:
+          - CONSUL_AGENT=1
+          - CONSUL=consul
+          - ES_CLUSTER_NAME=famished_test
+          - ES_SERVICE_NAME=elasticsearch-master
+          - ES_NODE_MASTER=true
+          - ES_NODE_DATA=true
+          - ES_ENVIRONMENT=dev
+          # - ES_CLUSTER_SIZE=1
 
-elasticsearch_master:
-    extends:
-      file: docker-compose.yml
-      service: elasticsearch
-    mem_limit: 512m
-    build: .
-    environment:
-      - CONSUL=consul
-      - ES_SERVICE_NAME=elasticsearch-master
-      - ES_NODE_MASTER=true
-      - ES_NODE_DATA=false
-      - CONTAINERPILOT=file:///etc/containerpilot.json
-    links:
-    - consul:consul
+          # are these even remotely accurate?
+          - ES_JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom -XX:-UseGCTaskAffinity -XX:-BindGCTaskThreadsToCPUs -XX:ParallelGCThreads=1 -XX:ParallelCMSThreads=1 -Xms128m -Xmx128m
 
-elasticsearch:
-    extends:
-      file: docker-compose.yml
-      service: elasticsearch
-    mem_limit: 512m
-    build: .
-    environment:
-      - CONSUL=consul
-      - ES_SERVICE_NAME=elasticsearch-master
-    links:
-      - consul:consul
+          # disable x-pack
+          - xpack.security.enabled=false
 
-elasticsearch_data:
-    extends:
-      file: docker-compose.yml
-      service: elasticsearch
-    mem_limit: 512m
-    build: .
-    environment:
-      - CONSUL=consul
-      - ES_SERVICE_NAME=elasticsearch-data
-      - ES_NODE_MASTER=false
-      - ES_NODE_DATA=true
-    links:
-      - consul:consul
+    elasticsearch_master:
+        extends:
+          service: elasticsearch
+        ports:
+          - 9200:9200
+          - 9300:9300
+        environment:
+          - ES_NODE_MASTER=true
+          - ES_NODE_DATA=false
 
-consul:
-    extends:
-      file: docker-compose.yml
-      service: consul
-    ports:
-      - 8500:8500
+    elasticsearch_data:
+        extends:
+          service: elasticsearch
+        environment:
+          - ES_SERVICE_NAME=elasticsearch-data
+          - ES_NODE_MASTER=false
+          - ES_NODE_DATA=true
+
+    consul:
+        image: autopilotpattern/consul:0.7.2-r0.8
+        command: >
+          /usr/local/bin/containerpilot
+          /bin/consul agent -server
+            -bootstrap
+            -config-dir=/etc/consul
+            -ui-dir /ui
+            -client=0.0.0.0
+        ports:
+          - 8500:8500

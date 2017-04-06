@@ -1,61 +1,64 @@
 #!/bin/bash
 
 MASTER=null
+CONSUL_HOST=${CONSUL}
+CONSUL_AGENT=${CONSUL_AGENT:=false}
 
-if [[ -z ${CONSUL} ]]; then
+readonly lockPath=service/elasticsearch-master/locks/master
+
+if [ $CONSUL_AGENT != false ]; then
+    CONSUL_HOST='localhost'
+fi
+
+if [[ -z $CONSUL_HOST ]]; then
     echo "Missing CONSUL environment variable"
     exit 1
 fi
 
+consulCommand() {
+    consul-cli --quiet --consul="${CONSUL_HOST}:8500" $*
+}
+
 preStart() {
-    # happy path is that there's a master available and we can cluster
-    configureMaster
-
-    # data-only nodes can only loop until there's a master available
-    if [ ${ES_NODE_MASTER} == false ]; then
-        while true
-        do
-            sleep 1.7
-            configureMaster
-        done
-        exit 0
-    fi
-
-    # for a master+data node, we'll retry to see if there's another
-    # master in the cluster in the process of starting up. But we
-    # bail out if we exceed the retries and just bootstrap the cluster
-    if [ ${ES_NODE_DATA} == true ]; then
-        local n=0
-        until [ $n -ge 2 ]
-        do
-            sleep 1.7
-            configureMaster
-            n=$((n+1))
-        done
-    fi
-
-    # for a master-only node or master+data node that's exceeded the
-    # retry attempts, we'll assume this is the first master and bootstrap
-    # the cluster
-    MASTER=127.0.0.1
-    replace
+    logDebug "preStart"
 }
 
-# get the list of ES master nodes from Consul
-configureMaster() {
-    MASTER=$(curl -Ls --fail http://${CONSUL}:8500/v1/catalog/service/elasticsearch-master | jq -r '.[0].ServiceAddress')
-    if [[ $MASTER != "null" ]] && [[ -n $MASTER ]]; then
-        replace
-        exit 0
-    fi
-    # if there's no master we fall thru and let the caller figure
-    # out what to do next
-}
+onStart() {
+    logDebug "onStart"
 
-# update discovery.zen.ping.unicast.hosts
-replace() {
-    REPLACEMENT=$(printf 's/^discovery\.zen\.ping\.unicast\.hosts.*$/discovery.zen.ping.unicast.hosts: ["%s"]/' ${MASTER})
-    sed -i "${REPLACEMENT}" /etc/elasticsearch/elasticsearch.yml
+    waitForLeader
+
+    getRegisteredServiceName
+    if [[ "${registeredServiceName}" == "elasticsearch-data" ]]; then
+
+        # wait for a healthy master
+        local i
+        for (( i = 0; i < ${MASTER_WAIT_TIMEOUT-60}; i++ )); do
+            getServiceAddresses "elasticsearch-master"
+            if [[ ${serviceAddresses} ]]; then
+                MASTER=$serviceAddresses
+                break
+            fi
+            sleep 1
+        done
+
+    else
+
+        # wait for a healthy master
+        local i
+        for (( i = 0; i < ${MASTER_WAIT_TIMEOUT-60}; i++ )); do
+            getServiceAddresses "elasticsearch-master"
+            if [[ ${serviceAddresses} ]]; then
+                MASTER=$serviceAddresses
+                break
+            fi
+            sleep 1
+        done
+
+    fi
+
+    # replace zen hosts
+    replaceZenHosts
 }
 
 health() {
@@ -63,5 +66,65 @@ health() {
     /usr/bin/curl --fail -s -o /dev/null http://${privateIp}:9200
 }
 
-# do whatever the arg is
-$1
+waitForLeader() {
+    logDebug "Waiting for consul leader"
+    local tries=0
+    while true
+    do
+        logDebug "Waiting for consul leader"
+        tries=$((tries + 1))
+        local leader=$(consulCommand --template="{{.}}" status leader)
+        if [[ -n "$leader" ]]; then
+            break
+        elif [[ $tries -eq 60 ]]; then
+            echo "No consul leader"
+            exit 1
+        fi
+        sleep 1
+    done
+}
+
+getServiceAddresses() {
+    local serviceInfo=$(consulCommand health service --passing "$1")
+    serviceAddresses=($(echo $serviceInfo | jq -r '.[].Service.Address'))
+    logDebug "serviceAddresses $1 ${serviceAddresses[*]}"
+}
+
+getRegisteredServiceName() {
+    registeredServiceName=$(jq -r '.services[0].name' /etc/containerpilot.json)
+}
+
+getNodeAddress() {
+    nodeAddress=$(ifconfig eth0 | awk '/inet addr/ {gsub("addr:", "", $2); print $2}')
+}
+
+replaceZenHosts() {
+    REPLACEMENT=$(printf 's/^discovery\.zen\.ping\.unicast\.hosts.*$/discovery.zen.ping.unicast.hosts: ["%s"]/' ${MASTER})
+    sed -i "${REPLACEMENT}" /usr/share/elasticsearch/config/elasticsearch.yml
+}
+
+logDebug() {
+    if [[ "${LOG_LEVEL}" == "DEBUG" ]]; then
+        echo "manage: $*"
+    fi
+}
+
+help() {
+    echo "Usage: ./manage.sh preStart       => configure Consul agent"
+    echo "       ./manage.sh onStart        => first-run configuration"
+    echo "       ./manage.sh health         => health check Elastic"
+    echo "       ./manage.sh preStop        => prepare for stop"
+}
+
+until
+    cmd=$1
+    if [[ -z "$cmd" ]]; then
+        help
+    fi
+    shift 1
+    $cmd "$@"
+    [ "$?" -ne 127 ]
+do
+    help
+    exit
+done
