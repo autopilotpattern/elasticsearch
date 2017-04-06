@@ -61,11 +61,5 @@ USER elasticsearch
 # after the creation of the directory so that we preserve ownership.
 VOLUME ["/usr/share/elasticsearch/data"]
 
-# Override the parent entrypoint
-ENTRYPOINT []
+# Start with containerpilot then to our wrapper
 CMD ["containerpilot", "/usr/local/bin/elastic-server.sh"]
-# CMD ["bin/es-docker"]
-# CMD ["/bin/bash", "bin/es-docker", "--default.path.conf=/etc/elasticsearch"]
-# ENTRYPOINT ["/bin/bash", "containerpilot"]
-# CMD ["bin/es-docker", "--default.path.conf=/etc/elasticsearch"]
-# CMD ["containerpilot"]
