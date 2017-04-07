@@ -4,8 +4,6 @@ MASTER=null
 CONSUL_HOST=${CONSUL}
 CONSUL_AGENT=${CONSUL_AGENT:=false}
 
-readonly lockPath=service/elasticsearch-master/locks/master
-
 if [ $CONSUL_AGENT != false ]; then
     CONSUL_HOST='localhost'
 fi
