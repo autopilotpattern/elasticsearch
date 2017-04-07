@@ -3,6 +3,11 @@ FROM docker.elastic.co/elasticsearch/elasticsearch:5.3.0
 # need to drop back into root!
 USER root
 
+# Remove x-pack
+# RUN /usr/share/elasticsearch/bin/elasticsearch-plugin remove x-pack
+# Bug in ES plugin (https://github.com/elastic/elasticsearch-docker/issues/35#issuecomment-285912424)
+RUN rm -rf /usr/share/elasticsearch/plugins/x-pack
+
 RUN apk update && \
     apk add jq curl unzip tar && \
     rm -rf /var/cache/apk/*

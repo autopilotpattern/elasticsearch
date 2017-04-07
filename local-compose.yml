@@ -17,9 +17,6 @@ services:
           # are these even remotely accurate?
           - ES_JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom -XX:-UseGCTaskAffinity -XX:-BindGCTaskThreadsToCPUs -XX:ParallelGCThreads=1 -XX:ParallelCMSThreads=1 -Xms128m -Xmx128m
 
-          # disable x-pack
-          - xpack.security.enabled=false
-
     elasticsearch_master:
         extends:
           service: elasticsearch
