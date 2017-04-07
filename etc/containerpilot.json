@@ -5,7 +5,6 @@
         "format": "text",
         "output": "stdout"
     },
-    "preStart": "/usr/local/bin/manage.sh preStart",
     "services": [{
         "name": "{{ .ES_SERVICE_NAME }}",
         "port": 9300,

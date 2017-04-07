@@ -19,10 +19,6 @@ consulCommand() {
     consul-cli --quiet --consul="${CONSUL_HOST}:8500" $*
 }
 
-preStart() {
-    logDebug "preStart"
-}
-
 onStart() {
     logDebug "onStart"
 
