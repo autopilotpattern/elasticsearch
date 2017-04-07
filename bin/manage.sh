@@ -86,8 +86,7 @@ logDebug() {
 }
 
 help() {
-    echo "Usage: ./manage.sh preStart       => configure Consul agent"
-    echo "       ./manage.sh onStart        => first-run configuration"
+    echo "Usage: ./manage.sh onStart        => first-run configuration"
     echo "       ./manage.sh health         => health check Elastic"
     echo "       ./manage.sh preStop        => prepare for stop"
 }
