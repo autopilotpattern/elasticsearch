@@ -24,34 +24,16 @@ onStart() {
 
     waitForLeader
 
-    getRegisteredServiceName
-    if [[ "${registeredServiceName}" == "elasticsearch-data" ]]; then
-
-        # wait for a healthy master
-        local i
-        for (( i = 0; i < ${MASTER_WAIT_TIMEOUT-60}; i++ )); do
-            getServiceAddresses "elasticsearch-master"
-            if [[ ${serviceAddresses} ]]; then
-                MASTER=$serviceAddresses
-                break
-            fi
-            sleep 1
-        done
-
-    else
-
-        # wait for a healthy master
-        local i
-        for (( i = 0; i < ${MASTER_WAIT_TIMEOUT-60}; i++ )); do
-            getServiceAddresses "elasticsearch-master"
-            if [[ ${serviceAddresses} ]]; then
-                MASTER=$serviceAddresses
-                break
-            fi
-            sleep 1
-        done
-
-    fi
+    # wait for a healthy master
+    local i
+    for (( i = 0; i < ${MASTER_WAIT_TIMEOUT-60}; i++ )); do
+        getServiceAddresses "elasticsearch-master"
+        if [[ ${serviceAddresses} ]]; then
+            MASTER=$serviceAddresses
+            break
+        fi
+        sleep 1
+    done
 
     # replace zen hosts
     replaceZenHosts
