@@ -40,9 +40,6 @@ COPY /etc/containerpilot.json /etc/containerpilot.json
 COPY /etc/elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
 COPY /bin/* /usr/local/bin/
 
-# Should we remove unzip?
-# RUN apk del unzip tar
-
 # Create and take ownership over required directories
 RUN mkdir -p /opt/consul/config \
     && mkdir -p /opt/consul/data \
