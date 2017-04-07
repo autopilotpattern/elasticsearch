@@ -65,7 +65,7 @@ network.host: _eth0:ipv4_
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-discovery.zen.ping.unicast.hosts: ["${ES_BOOTSTRAP_HOST}"]
+# discovery.zen.ping.unicast.hosts: []
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #

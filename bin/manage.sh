@@ -77,7 +77,7 @@ getNodeAddress() {
 }
 
 replaceZenHosts() {
-    REPLACEMENT=$(printf 's/^discovery\.zen\.ping\.unicast\.hosts.*$/discovery.zen.ping.unicast.hosts: ["%s"]/' ${MASTER})
+    REPLACEMENT=$(printf 's/^# discovery\.zen\.ping\.unicast\.hosts.*$/discovery.zen.ping.unicast.hosts: ["%s"]/' ${MASTER})
     sed -i "${REPLACEMENT}" /usr/share/elasticsearch/config/elasticsearch.yml
 }
 
