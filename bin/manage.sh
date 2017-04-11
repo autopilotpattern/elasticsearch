@@ -35,6 +35,9 @@ onStart() {
 
     # replace zen hosts
     replaceZenHosts
+
+    # seccomp (not supported on joyent)
+    replaceSeccomp
 }
 
 health() {
@@ -77,6 +80,15 @@ getNodeAddress() {
 replaceZenHosts() {
     REPLACEMENT=$(printf 's/^# discovery\.zen\.ping\.unicast\.hosts.*$/discovery.zen.ping.unicast.hosts: ["%s"]/' ${MASTER})
     sed -i "${REPLACEMENT}" /usr/share/elasticsearch/config/elasticsearch.yml
+}
+
+replaceSeccomp() {
+    SECCOMP_ENABLED=$(zcat /proc/config.gz | grep CONFIG_SECCOMP=y)
+    if [[ "${SECCOMP_ENABLED}" != "CONFIG_SECCOMP=y" ]]; then
+        echo "WARNING: seccomp unavailable, disabling system_call_filter..."
+        REPLACEMENT=$(printf 's/^# bootstrap\.system_call_filter.*$/bootstrap.system_call_filter: false/')
+        sed -i "${REPLACEMENT}" /usr/share/elasticsearch/config/elasticsearch.yml
+    fi
 }
 
 logDebug() {

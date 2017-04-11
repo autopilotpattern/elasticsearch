@@ -1,22 +1,37 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:5.3.0
+FROM docker.elastic.co/elasticsearch/elasticsearch-alpine-base:latest
 
-# need to drop back into root!
-USER root
+# LICENSE - Apache License 2.0
+# https://github.com/elastic/elasticsearch-alpine-base/blob/master/LICENSE
 
-# Remove x-pack
-# RUN /usr/share/elasticsearch/bin/elasticsearch-plugin remove x-pack
-# Bug in ES plugin (https://github.com/elastic/elasticsearch-docker/issues/35#issuecomment-285912424)
-RUN rm -rf /usr/share/elasticsearch/plugins/x-pack
+ENV ELASTIC_VERSION=5.3.0 \
+    PATH=/usr/share/elasticsearch/bin:$PATH \
+    JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk \
+    CONSUL_VERSION=0.7.5 \
+    CONSUL_CLI_VER=0.3.1 \
+    CONTAINERPILOT_VER=2.7.2 \
+    CONTAINERPILOT=file:///etc/containerpilot.json
 
+WORKDIR /usr/share/elasticsearch
+
+# Required dependencies
 RUN apk update && \
     apk add jq curl unzip tar && \
     rm -rf /var/cache/apk/*
 
-# Add Containerpilot and set its configuration
-ENV CONSUL_VERSION=0.7.5 \
-    CONSUL_CLI_VER=0.3.1 \
-    CONTAINERPILOT_VER=2.7.2 \
-    CONTAINERPILOT=file:///etc/containerpilot.json
+# Download/extract defined ES version. busybox tar can't strip leading dir.
+RUN export ELASTIC_CHECKSUM=9273fdecb2251755887f1234d6cfcc91e44a384d && \
+    wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ELASTIC_VERSION}.tar.gz && \
+    test $ELASTIC_CHECKSUM == $(sha1sum elasticsearch-${ELASTIC_VERSION}.tar.gz | awk '{print $1}') && \
+    tar zxf elasticsearch-${ELASTIC_VERSION}.tar.gz && \
+    chown -R elasticsearch:elasticsearch elasticsearch-${ELASTIC_VERSION} && \
+    mv elasticsearch-${ELASTIC_VERSION}/* . && \
+    rmdir elasticsearch-${ELASTIC_VERSION} && \
+    rm elasticsearch-${ELASTIC_VERSION}.tar.gz
+
+RUN set -ex && for esdirs in config data logs; do \
+        mkdir -p "$esdirs"; \
+        chown -R elasticsearch:elasticsearch "$esdirs"; \
+    done
 
 # Add consul agent
 RUN export CONSUL_CHECKSUM=40ce7175535551882ecdff21fdd276cef6eaab96be8a8260e0599fadb6f1f5b8 \
@@ -40,22 +55,25 @@ RUN export CONTAINERPILOT_CHECKSUM=e886899467ced6d7c76027d58c7f7554c2fb2bcc \
     && tar zxf /tmp/containerpilot.tar.gz -C /usr/local/bin \
     && rm /tmp/containerpilot.tar.gz
 
-# Add our configuration files and scripts
-COPY /etc/containerpilot.json /etc/containerpilot.json
-COPY /etc/elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+USER elasticsearch
+COPY /etc/containerpilot.json /etc/
+COPY /etc/elasticsearch.yml config/
+COPY /etc/log4j2.properties config/
+COPY /bin/es-docker bin/es-docker
 COPY /bin/* /usr/local/bin/
 
-# Create and take ownership over required directories
-RUN mkdir -p /opt/consul/config \
-    && mkdir -p /opt/consul/data \
-    && chmod 770 /opt/consul/data \
-    && chown -R elasticsearch:elasticsearch /opt/consul \
-    && mkdir -p /etc/containerpilot \
-    && chmod -R g+w /etc/containerpilot \
-    && chmod +x /usr/local/bin/elastic-server.sh \
-    && chown -R elasticsearch:elasticsearch /etc/containerpilot
+USER root
+RUN chown elasticsearch:elasticsearch config/elasticsearch.yml config/log4j2.properties bin/es-docker && \
+    chmod 0750 bin/es-docker && \
+    mkdir -p /opt/consul/config && \
+    mkdir -p /opt/consul/data && \
+    chmod 770 /opt/consul/data && \
+    chown -R elasticsearch:elasticsearch /opt/consul && \
+    mkdir -p /etc/containerpilot && \
+    chmod -R g+w /etc/containerpilot && \
+    chmod +x /usr/local/bin/elastic-server.sh && \
+    chown -R elasticsearch:elasticsearch /etc/containerpilot
 
-# back to elastic USER
 USER elasticsearch
 
 # Expose the data directory as a volume in case we want to mount these
@@ -65,3 +83,6 @@ VOLUME ["/usr/share/elasticsearch/data"]
 
 # Start with containerpilot then to our wrapper
 CMD ["containerpilot", "/usr/local/bin/elastic-server.sh"]
+
+
+EXPOSE 9200 9300
