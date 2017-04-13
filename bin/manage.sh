@@ -46,17 +46,17 @@ health() {
 }
 
 waitForLeader() {
-    logDebug "Waiting for consul leader"
+    logDebug "Waiting for consul server"
     local tries=0
     while true
     do
-        logDebug "Waiting for consul leader"
+        logDebug "Waiting for consul server"
         tries=$((tries + 1))
-        local leader=$(consulCommand --template="{{.}}" status leader)
-        if [[ -n "$leader" ]]; then
+        local server=$(consul members -status alive | grep server)
+        if [[ -n "$server" ]]; then
             break
         elif [[ $tries -eq 60 ]]; then
-            echo "No consul leader"
+            echo "No consul server"
             exit 1
         fi
         sleep 1
