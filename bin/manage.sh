@@ -36,7 +36,7 @@ onStart() {
     # replace zen hosts
     replaceZenHosts
 
-    # seccomp (not supported on joyent)
+    # disable seccomp (only supported on newer Linux kernels)
     replaceSeccomp
 }
 
