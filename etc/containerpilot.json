@@ -7,7 +7,7 @@
     },
     "services": [{
         "name": "{{ .ES_SERVICE_NAME }}",
-        "port": 9300,
+        "port": 9200,
         "health": "/usr/local/bin/manage.sh health",
         "poll": 10,
         "ttl": 25
