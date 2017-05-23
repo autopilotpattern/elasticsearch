@@ -141,3 +141,14 @@ $ curl "http://${MASTER_IP}:9200/_cluster/state?pretty=true"
 }
 
 ```
+
+### Dockerfile
+
+Elastic has depreciated the official repository in favor of their own registry.
+
+> This image will receive no further updates after 2017-06-20 (June 20, 2017). Please adjust your usage accordingly. - [Docker Hub](https://hub.docker.com/_/elasticsearch/)
+
+Unfortunately they don't include the Dockerfile as part of the elasticsearch repository, links are included below for easy reference.
+
+* [Dockerfile](https://github.com/elastic/elasticsearch-docker/blob/master/build/elasticsearch/Dockerfile)
+* [Base Dockerfile](https://github.com/elastic/elasticsearch-alpine-base/blob/master/build/elasticsearch-alpine-base/Dockerfile)

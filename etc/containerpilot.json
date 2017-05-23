@@ -1,13 +1,28 @@
 {
-  "consul": "{{ .CONSUL }}:8500",
-  "preStart": "/usr/local/bin/manage.sh preStart",
-  "services": [
-    {
-      "name": "{{ .ES_SERVICE_NAME }}",
-      "port": 9300,
-      "health": "/usr/local/bin/manage.sh health",
-      "poll": 10,
-      "ttl": 25
-    }
-  ]
+    "consul": "{{ if .CONSUL_AGENT }}localhost{{ else }}{{ if .CONSUL }}{{ .CONSUL }}{{ else }}consul{{ end }}{{ end }}:8500",
+    "logging": {
+        "level": "{{ if .LOG_LEVEL }}{{ .LOG_LEVEL }}{{ else }}INFO{{ end }}",
+        "format": "text",
+        "output": "stdout"
+    },
+    "services": [{
+        "name": "{{ .ES_SERVICE_NAME }}",
+        "port": 9200,
+        "health": "/usr/local/bin/manage.sh health",
+        "poll": 10,
+        "ttl": 25
+    }],
+    "coprocesses": [{{ if .CONSUL_AGENT }}
+        {
+            "command": ["/usr/local/bin/consul", "agent",
+                "-data-dir=/opt/consul/data",
+                "-config-dir=/opt/consul/config",
+                "-rejoin",
+                "-retry-join", "{{ if .CONSUL }}{{ .CONSUL }}{{ else }}consul{{ end }}",
+                "-retry-max", "10",
+                "-retry-interval", "10s"
+            ],
+            "restarts": "unlimited"
+        }
+    {{ end }}]
 }
