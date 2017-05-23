@@ -46,6 +46,11 @@ health() {
 }
 
 waitForLeader() {
+    # no need to wait for a leader unless we are using consul in agent mode
+    if [ $CONSUL_HOST != 'localhost' ]; then
+        return
+    fi
+
     logDebug "Waiting for consul server"
     local tries=0
     while true
